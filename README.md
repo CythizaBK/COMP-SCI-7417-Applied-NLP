@@ -17,14 +17,14 @@ step 3: 计算文档向量d与问题向量q的cosine相似度，计算公式如�
 
 cosine相似度计算公式参考教科书等4页公式(14.6)
 
-如果用户指定的文章或者文本匹配模块所匹配到的最佳参考文章过长，超出了模型的token限制，那么使用spacy提取出文章中的每个句子，计算每个句子与问题之间的相似度，并选择匹配度最高的n个句子作为新的参考文章。在我们的项目中，n的值被设定为3。
-NLP模型模块是QA系统的核心，它接受一个问题和一篇参考文章，并从参考文章中找到答案所谓的位置，并提取出答案文本。NLP模型模块的根据问题和上下文信息生成自然语言的答案。在下章节中，我们将会详细介绍该模块的NLP模型选择和介绍。
+如果用户指定的文章或者文本匹配模块所匹配到的最佳参考文章过长，超出了模型的token限制，那么使用spacy提取出文章中的每个句子，计算每个句子与问题之间的相似度，并选择匹配度最高的n个句子作为新的参考文章。在项目中，n的值被设定为3。
+NLP模型模块是QA系统的核心，它接受一个问题和一篇参考文章，并从参考文章中找到答案所谓的位置，并提取出答案文本。NLP模型模块的根据问题和上下文信息生成自然语言的答案。在下章节中，将会详细介绍该模块的NLP模型选择和介绍。
 
 
 4.模型选择和训练：
-我们选择BERT(Bidirectional Encoder Representations from Transformers)作为问答系统中的NLP模型。它是由Google在2018年推出的预训练语言模型，它在多项自然语言处理任务上展现了强大的性能。我们首先从Hugging Face加载bert-large-uncased-whole-word-masking-finetuned-squad预训练模型。预训练模型名称中的"Large"意味着该模型具有更多的参数，通常能够捕获更复杂的语言特征，虽然这也会增加计算资源的需求。"Uncased"表示模型在预处理时忽略大小写，这简化了文本处理过程，同时对于大多数问答场景来说，大小写差异并不影响语义理解。”Finetuned on SQuAD”意味着该模型在SQuAD（Stanford Question Answering Dataset）上进行了微调。SQuAD是自然语言处理领域中一个广泛使用的阅读理解数据集，它包含大量的问题-篇章对，要求模型在给定的文本中找到正确答案。经过SQuAD数据集微调的BERT模型特别擅长于从文本中抽取答案。但该模型可能在本项目数据(新闻数据)中的性能并不好，因此我们还会根据新闻数据中的问题-篇章-答案数据进行微调。为了验证我们微调过的BERT更适合新闻数据的问答系统，我们将bert-large-uncased-whole-word-masking-finetuned-squad作为baseline模型。
-我们从news数据中随机抽取了41篇文章，对于每一篇文章设计了问题，然后根据文章内容提取出合适的答案。这样我们可以得到41对问题-文章-答案数据，这些数据作为训练集，用于微调BERT。模型以Cross-Entropy Loss作为损失函数。我们选择AdamW作为优化器，学习率为0.00001,训练迭代20次后，损失函数以及收敛，停止训练后作为最终预测模型。我们使用F1-score和exact match(EM)作为模型评估指标。这是因为我们大部分个案的答案都非常简单，只有几个单词。An example of question for article number 17574 would be: “Who is the vice chairman of Samsung”, answer: “Jay Y. Lee”.
-对于微调过的BERT，我们使用SQuAD 2.0作为测试集，对比模型在不同数据集之间的性能。模型的训练包括如下步骤：
+选择BERT(Bidirectional Encoder Representations from Transformers)作为问答系统中的NLP模型。它是由Google在2018年推出的预训练语言模型，它在多项自然语言处理任务上展现了强大的性能。首先从Hugging Face加载bert-large-uncased-whole-word-masking-finetuned-squad预训练模型。预训练模型名称中的"Large"意味着该模型具有更多的参数，通常能够捕获更复杂的语言特征，虽然这也会增加计算资源的需求。"Uncased"表示模型在预处理时忽略大小写，这简化了文本处理过程，同时对于大多数问答场景来说，大小写差异并不影响语义理解。”Finetuned on SQuAD”意味着该模型在SQuAD（Stanford Question Answering Dataset）上进行了微调。SQuAD是自然语言处理领域中一个广泛使用的阅读理解数据集，它包含大量的问题-篇章对，要求模型在给定的文本中找到正确答案。经过SQuAD数据集微调的BERT模型特别擅长于从文本中抽取答案。但该模型可能在本项目数据(新闻数据)中的性能并不好，因此我们还会根据新闻数据中的问题-篇章-答案数据进行微调。为了验证,微调过的BERT更适合新闻数据的问答系统，将bert-large-uncased-whole-word-masking-finetuned-squad作为baseline模型。
+从news数据中随机抽取了41篇文章，对于每一篇文章设计了问题，然后根据文章内容提取出合适的答案。这样我们可以得到41对问题-文章-答案数据，这些数据作为训练集，用于微调BERT。模型以Cross-Entropy Loss作为损失函数。选择AdamW作为优化器，学习率为0.00001,训练迭代20次后，损失函数以及收敛，停止训练后作为最终预测模型。我们使用F1-score和exact match(EM)作为模型评估指标。这是因为我们大部分个案的答案都非常简单，只有几个单词。An example of question for article number 17574 would be: “Who is the vice chairman of Samsung”, answer: “Jay Y. Lee”.
+对于微调过的BERT，使用SQuAD 2.0作为测试集，对比模型在不同数据集之间的性能。模型的训练包括如下步骤：
 从文章中找到找到答案所在的起始索引和结束索引
 Tokenize passages and queries。我们select the BERT-base pretrained model “bert-base-uncased” for the tokenization.
 Convert the start-end positions to tokens start-end positions.
