@@ -1,6 +1,6 @@
 # COMP SCI 7417
 Applied Natural Language Processing
-2024 semester1 
+2024 semester1 at Adelaide
 Assignment 2: Mini-project (report and code)
 individual task for level 2- fine tuning bert
 report for individual：
