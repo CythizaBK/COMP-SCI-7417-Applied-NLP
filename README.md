@@ -2,7 +2,7 @@
 Applied Natural Language Processing
 2024 semester1 
 Assignment 2: Mini-project (report and code)
-individual task for level 2- fine tuned bert
+individual task for level 2- fine tuning bert
 report for individual：
 系统架构
 设计的问答系统架构如下流程图所示：
