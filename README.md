@@ -1,4 +1,4 @@
-# COMP SCI 7205
+# COMP SCI 7417
 Applied Natural Language Processing
 2024 semester1 
 Assignment 2: Mini-project (report and code)
